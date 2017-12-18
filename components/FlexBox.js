@@ -5,4 +5,5 @@ export default styled.div`
   flex-basis: ${({ basis }) => basis};
   flex-direction: ${({ direction }) => direction};
   flex-wrap: wrap;
+  justify-content: ${({ justify }) => justify};
 `;

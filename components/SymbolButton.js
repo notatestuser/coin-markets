@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from '../routes';
 
 const StyledButton = styled.a`
   background: rgba(0, 0, 0, 0.05);
@@ -26,4 +27,7 @@ const StyledButton = styled.a`
   }
 `;
 
-export default props => <StyledButton {...props} />;
+export default props => (
+  <Link route={props.route}>
+    <StyledButton>{props.children}</StyledButton>
+  </Link>);

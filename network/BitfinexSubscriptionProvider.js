@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Spin } from 'antd';
 
-import { contextTypes } from './BitfinexSocketProvider';
-import { socketQueue, socketSubscribed } from '../actions/websocket';
-
-const WAITING_MSG = 'Waiting for the socket to open…';
+import { socketQueue } from '../actions/websocket';
+import { getSubscriptionStateId } from '../store/utils';
 
 class BitfinexSubscriptionProvider extends Component {
-  static contextTypes = contextTypes;
+  static childContextTypes = {
+    isLoading: PropTypes.bool,
+  };
 
   static propTypes = {
-    id: PropTypes.string.isRequired, // in state as `channel + symbol`
     req: PropTypes.object.isRequired, // e.g. { channel: "ticker", symbol: "tBTCUSD" }
     hideWhileWaiting: PropTypes.bool,
   };
@@ -21,14 +21,17 @@ class BitfinexSubscriptionProvider extends Component {
     hideWhileWaiting: false,
   };
 
-  static mapStateToProps = ({ bfxConnected, bfxSubscriptions }, { id }) => ({
-    bfxConnected, bfxSubscriptions, isSubscribed: bfxSubscriptions[id],
+  static mapStateToProps = ({ bfxConnected, bfxSubscriptions }, { req }) => ({
+    bfxConnected,
+    bfxSubscriptions,
+    isSubscribed: bfxSubscriptions[getSubscriptionStateId(req)],
   });
 
   static mapDispatchToProps = (dispatch) => ({
     socketQueue: bindActionCreators(socketQueue, dispatch),
-    socketSubscribed: bindActionCreators(socketSubscribed, dispatch),
   });
+
+  getChildContext = () => ({ isLoading: !this.props.isSubscribed })
 
   componentWillMount() {
     this._subscribe();
@@ -47,7 +50,7 @@ class BitfinexSubscriptionProvider extends Component {
   render() {
     const { hideWhileWaiting, isSubscribed } = this.props;
     if (!hideWhileWaiting) return this.props.children;
-    if (!isSubscribed) return <span>{WAITING_MSG}&ellip;</span>;
+    if (!isSubscribed) return <Spin size="large" />;
     return this.props.children;
   }
 }
