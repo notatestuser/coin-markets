@@ -43,6 +43,7 @@
     "no-multi-assign": ["off"],
     "no-param-reassign": ["off"],
     "no-unused-expressions": ["off"],
+    "class-methods-use-this": ["off"],
     "arrow-parens": ["off"],
     "function-paren-newline": ["off"],
     "import/no-named-as-default": ["off"]
