@@ -10,6 +10,7 @@ import {
 import enUS from 'antd/lib/locale-provider/en_US';
 
 import BitfinexSocketProvider from '../network/BitfinexSocketProvider';
+import ConnectionStatus from '../components/ConnectionStatus';
 
 const {
   Header,
@@ -61,8 +62,11 @@ export default ({ children }) => (
               <Menu.Item key="2">
                 <a href="/trade/btcusd">Trade View</a>
               </Menu.Item>
-              <Menu.Item key="3" style={{ float: 'right' }}>
-                Force Disconnect WebSocket
+              <Menu.Item key="4" style={{ float: 'right' }}>
+                Disconnect
+              </Menu.Item>
+              <Menu.Item key="3" style={{ float: 'right' }} disabled={true}>
+                <ConnectionStatus stateKey="bfxConnected" />
               </Menu.Item>
             </Menu>
           </Header>

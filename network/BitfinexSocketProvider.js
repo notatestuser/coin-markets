@@ -16,7 +16,7 @@ export const contextTypes = {
 };
 
 class BitfinexSocketProvider extends Component {
-  static childContextTypes = contextTypes
+  static childContextTypes = contextTypes;
 
   static mapStateToProps({ bfxConnected }) {
     return { bfxConnected };
