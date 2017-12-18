@@ -2,6 +2,7 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const cors = require('cors');
 const next = require('next');
+const bog = require('bog');
 const routes = require('./routes');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -12,7 +13,7 @@ const handler = routes.getRequestHandler(app);
 const BITFINEX_API = 'https://api.bitfinex.com/';
 
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught exception', err);
+  bog.error('Uncaught exception', err);
 });
 
 app.prepare()
@@ -36,6 +37,6 @@ app.prepare()
 
     server.listen(port, (err) => {
       if (err) throw err;
-      console.log(`> Ready on http://localhost:${port}`);
+      bog.info(`> Ready on http://localhost:${port}`);
     });
   });

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import withRedux from 'next-redux-wrapper';
 import is from 'is';
+import bog from 'bog';
 
 import ifetch from 'isomorphic-fetch';
 import initStore from '../store/initStore';
@@ -20,7 +21,7 @@ class Index extends Component {
       if (json.error) throw new Error(json.error);
       symbols = json;
     } catch (err) {
-      console.error(`Could not fetch symbols: ${err.message || err}`);
+      bog.error(`Could not fetch symbols: ${err.message || err}`);
     }
     return { symbols };
   }
