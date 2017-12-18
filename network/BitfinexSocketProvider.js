@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import bog from 'bog';
 
-import { socketConnected, socketDisconnected } from '../actions/websocket';
+import { socketConnected, socketDisconnected, socketReceived, socketFlush } from '../actions/websocket';
 
 const BITFINEX_WS = 'wss://api.bitfinex.com/ws/2';
 const CID = 1234;
@@ -18,16 +18,18 @@ export const contextTypes = {
 class BitfinexSocketProvider extends Component {
   static childContextTypes = contextTypes;
 
-  static mapStateToProps({ bfxConnected }) {
-    return { bfxConnected };
-  }
+  static mapStateToProps = ({ bfxConnected, bfxSendQueue }) => ({ bfxConnected, bfxSendQueue });
 
-  static mapDispatchToProps(dispatch) {
-    return {
-      socketConnected: bindActionCreators(socketConnected, dispatch),
-      socketDisconnected: bindActionCreators(socketDisconnected, dispatch),
-    };
-  }
+  static mapDispatchToProps = (dispatch) => ({
+    socketConnected: bindActionCreators(socketConnected, dispatch),
+    socketDisconnected: bindActionCreators(socketDisconnected, dispatch),
+    socketReceived: bindActionCreators(socketReceived, dispatch),
+    socketFlush: bindActionCreators(socketFlush, dispatch),
+  });
+
+  state = {
+    closing: false, // do not reconnect when unmounting
+  };
 
   componentDidMount() {
     this._connect();
@@ -35,6 +37,14 @@ class BitfinexSocketProvider extends Component {
 
   componentDidUpdate() {
     this._connect();
+    this._processSendQueue();
+  }
+
+  componentWillUnmount() {
+    if (!this._socket) return;
+    this.setState({ closing: true }, () => {
+      this._socket && this._socket.close();
+    });
   }
 
   getChildContext() {
@@ -44,14 +54,18 @@ class BitfinexSocketProvider extends Component {
 
   _connect() {
     if (!window.WebSocket) return; // server-side render?
+    if (this.state.closing) return; // component unmounting
     if (this._socket && this._socket.readyState === 1) return; // connected
     if (this._socket && !this._socket.readyState) this._socket.close();
+    bog.info('WebSocket connecting');
     const ws = (this._socket = new WebSocket(BITFINEX_WS));
     ws.onmessage = ev => {
       bog.info(ev.data);
       const obj = JSON.parse(ev.data);
       if (obj.event === 'pong') {
         this.props.socketConnected();
+      } else {
+        this.props.socketReceived(obj);
       }
     };
     ws.onopen = () => {
@@ -65,18 +79,32 @@ class BitfinexSocketProvider extends Component {
       bog.error('WebSocket error', err);
       ws.close();
       this.props.socketDisconnected();
-      setTimeout(() => {
-        this._connect();
-      }, ERROR_RECONNECT_DELAY);
+      this._scheduleReconnect();
     };
     ws.onclose = () => {
       this._socket = null;
+      this._scheduleReconnect();
     };
   }
 
-  _send(data) {
+  _scheduleReconnect() {
+    if (this.state.closing) return;
+    setTimeout(() => {
+      this._connect();
+    }, ERROR_RECONNECT_DELAY);
+  }
+
+  _processSendQueue() {
+    const { bfxSendQueue } = this.props;
+    bfxSendQueue.forEach((obj) => {
+      this._send(obj);
+    });
+    this.props.socketFlush();
+  }
+
+  _send(obj) {
     if (!this._socket || this._socket.readyState !== 1) return; // connected
-    this._socket.send(JSON.stringify(data));
+    this._socket.send(JSON.stringify(obj));
   }
 
   render() {
