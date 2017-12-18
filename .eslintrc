@@ -41,6 +41,8 @@
     "no-underscore-dangle": ["off"],
     "no-multi-assign": ["off"],
     "no-param-reassign": ["off"],
+    "arrow-parens": ["off"],
+    "function-paren-newline": ["off"],
     "import/no-named-as-default": ["off"]
   }
 }
