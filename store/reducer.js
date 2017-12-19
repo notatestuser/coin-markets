@@ -103,9 +103,9 @@ const handleSocketReceived = (state, { payload }) => {
       switch (payload.channel) {
         case 'book': return handleSubscribedBook(state, payload);
         case 'trades': return handleSubscribedTrades(state, payload);
-        default: return state;
+        default: return Object.assign({}, state);
       }
-    default: return state;
+    default: return Object.assign({}, state);
   }
 };
 
@@ -113,14 +113,16 @@ export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.BFX_SOCKET_CONNECTED:
       // start from initialState each time the socket connects to keep data safe.
-      return Object.assign({}, initialState, {
+      return Object.assign({}, state, {
         bfxConnected: true,
+        bfxSubscriptions: {},
+        tickers: {},
+        books: {},
+        trades: {},
       });
     case actionTypes.BFX_SOCKET_DISCONNECTED:
       return Object.assign({}, state, {
-        bfxSocket: null,
         bfxConnected: false,
-        bfxSubscriptions: {},
       });
     case actionTypes.BFX_SOCKET_RECEIVED:
       return handleSocketReceived(state, action);

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import withRedux from 'next-redux-wrapper';
 import dynamic from 'next/dynamic';
+import styled from 'styled-components';
 
 import initStore from '../store/initStore';
 import Layout from '../components/Layout';
@@ -15,6 +16,8 @@ const BitfinexSocketProvider = dynamic(import('../network/BitfinexSocketProvider
 });
 
 const FREQ = 'F1';
+
+const PaddedFlexBox = styled(FlexBox)` padding: 0 15px; `;
 
 class TradePage extends Component {
   static async getInitialProps({ query }) {
@@ -38,32 +41,40 @@ class TradePage extends Component {
     };
     return (
       <Layout breadcrumb={<strong>Viewing Market: {symbol}</strong>} url={this.props.url}>
+        <FlexBox justify="space-between" padding="0 10px">
+          <PaddedFlexBox basis="30%" direction="column">
+            <Heading uppercase={true}>
+              Ticker
+            </Heading>
+
+          </PaddedFlexBox>
+        </FlexBox>
         <BitfinexSocketProvider>
-          <FlexBox justify="space-around">
+          <FlexBox justify="space-between" padding="0 10px">
             <BitfinexSubscriptionProvider req={ordersReq}>
-              <FlexBox basis="350px" direction="column">
+              <PaddedFlexBox basis="30%" direction="column">
                 <Heading uppercase={true}>
                   Bid Orders
                 </Heading>
                 <OrderBook symbol={symbol} type="bids" />
-              </FlexBox>
-              <FlexBox basis="350px" direction="column">
+              </PaddedFlexBox>
+              <PaddedFlexBox basis="30%" direction="column">
                 <Heading uppercase={true}>
                   Ask Orders
                 </Heading>
                 <OrderBook symbol={symbol} type="asks" />
-              </FlexBox>
+              </PaddedFlexBox>
             </BitfinexSubscriptionProvider>
-            <FlexBox basis="450px">
+            <PaddedFlexBox basis="40%">
               <BitfinexSubscriptionProvider req={tradesReq}>
-                <FlexBox basis="450px" direction="column">
+                <FlexBox basis="100%" direction="column">
                   <Heading uppercase={true}>
                     Trades
                   </Heading>
                   <Trades symbol={symbol} />
                 </FlexBox>
               </BitfinexSubscriptionProvider>
-            </FlexBox>
+            </PaddedFlexBox>
           </FlexBox>
         </BitfinexSocketProvider>
       </Layout>);

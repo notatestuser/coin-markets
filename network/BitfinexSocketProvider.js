@@ -71,7 +71,6 @@ class BitfinexSocketProvider extends Component {
     const ws = new WebSocket(BITFINEX_WS);
     setSocket(ws);
     ws.onmessage = ev => {
-      // bog.info('Data received:', ev.data);
       const obj = JSON.parse(ev.data);
       if (obj.event === 'pong') {
         this.props.socketConnected();
@@ -95,7 +94,6 @@ class BitfinexSocketProvider extends Component {
     ws.onclose = () => {
       setSocket(null);
       this.props.socketDisconnected();
-      this._scheduleReconnect();
     };
   }
 

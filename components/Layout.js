@@ -12,6 +12,7 @@ import enUS from 'antd/lib/locale-provider/en_US';
 
 import { Link } from '../routes';
 import ConnectionStatus from '../components/ConnectionStatus';
+import DisconnectButton from '../components/DisconnectButton';
 
 const {
   Header,
@@ -76,7 +77,8 @@ export default ({ breadcrumb, url, children }) => (
               </Link>
             </Menu.Item>
             <Menu.Item key="4" style={{ float: 'right' }}>
-              Disconnect
+              {/* Hacky last minute force disconnect. Sorry! */}
+              <DisconnectButton />
             </Menu.Item>
             <Menu.Item key="3" style={{ float: 'right' }} disabled={true}>
               <ConnectionStatus stateKey="bfxConnected" />

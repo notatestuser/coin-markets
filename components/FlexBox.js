@@ -6,4 +6,6 @@ export default styled.div`
   flex-direction: ${({ direction }) => direction};
   flex-wrap: wrap;
   justify-content: ${({ justify }) => justify};
+  min-width: 256px;
+  padding: ${({ padding }) => padding};
 `;

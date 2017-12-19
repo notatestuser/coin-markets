@@ -36,6 +36,7 @@ class Trades extends Component {
     }, {
       title: 'TIME',
       dataIndex: 'timestamp',
+      render: timestamp => new Date(timestamp).toLocaleString(),
     }, {
       title: 'AMOUNT',
       dataIndex: 'amount',
