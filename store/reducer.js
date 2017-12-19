@@ -15,6 +15,27 @@ export const initialState = {
   trades: {},
 };
 
+// ticker update e.g. [4,[768,277.00968832,768.01,430.58985595,...]]
+
+const updateTicker = (book, update) => {
+  if (!book || !update) return;
+  const [
+    bid,
+    bidSize,
+    ask,
+    askSize,
+    dailyChange,
+    dailyChangePerc,
+    lastPrice,
+    volume,
+    high,
+    low,
+  ] = update;
+  Object.assign(book, {
+    bid, bidSize, ask, askSize, dailyChange, dailyChangePerc, lastPrice, volume, high, low,
+  });
+};
+
 // books snapshot e.g. [3632,[[0.04199,1,8.96],[0.041982,2,0.76118988],...]]
 // books update e.g. [3632,[0.041813,0,1]]
 
@@ -60,7 +81,13 @@ const handleSnapshotOrUpdate = (state, payload) => {
   const [chanId] = payload;
   const mapping = state.bfxChannels[chanId];
   if (!mapping) return state; // unknown chanId
-  const updateFn = mapping[0] === 'books' ? updateBook : updateTrade;
+  let updateFn;
+  switch (mapping[0]) {
+    case 'books': updateFn = updateBook; break;
+    case 'trades': updateFn = updateTrade; break;
+    case 'tickers': updateFn = updateTicker; break;
+    default: throw new Error('Unknown channel type');
+  }
   const book = state[mapping[0]][mapping[1]];
   const listIdx = typeof payload[1] === 'string' ? 2 : 1; // skip over `te`/`tu`
   if (!payload[listIdx]) return state;
@@ -75,6 +102,19 @@ const handleSnapshotOrUpdate = (state, payload) => {
   } else if (Array.isArray(payload[listIdx])) {
     updateFn(book, payload[listIdx]);
   }
+  state[mapping[0]][mapping[1]] = Object.assign({}, book); // re-render connected components
+  return Object.assign({}, state);
+};
+
+// {"event":"subscribed","channel":"ticker","chanId":4,"symbol":"tETHUSD","pair":"ETHUSD"}
+// [4,[768,277.00968832,768.01,430.58985595,58.18,0.082,768,447505.90550396,798.9,660]]
+
+const handleSubscribedTicker = (state, payload) => {
+  const { chanId, pair } = payload;
+  const stateId = getSubscriptionStateId(payload);
+  state.bfxSubscriptions[stateId] = chanId;
+  state.bfxChannels[chanId] = ['tickers', pair];
+  state.tickers[pair] = { };
   return Object.assign({}, state);
 };
 
@@ -101,6 +141,7 @@ const handleSocketReceived = (state, { payload }) => {
   switch (payload.event) {
     case 'subscribed':
       switch (payload.channel) {
+        case 'ticker': return handleSubscribedTicker(state, payload);
         case 'book': return handleSubscribedBook(state, payload);
         case 'trades': return handleSubscribedTrades(state, payload);
         default: return Object.assign({}, state);

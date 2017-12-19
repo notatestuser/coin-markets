@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Spin } from 'antd';
+import bog from 'bog';
 
 import { socketQueue } from '../actions/websocket';
 import { getSubscriptionStateId } from '../store/utils';
@@ -44,6 +45,7 @@ class BitfinexSubscriptionProvider extends Component {
   _subscribe(props = this.props) {
     const { bfxConnected, isSubscribed, req } = props;
     if (!bfxConnected || isSubscribed) return;
+    bog.info(`Subscribing to ${req.channel} for ${req.symbol}`);
     this.props.socketQueue(req);
   }
 

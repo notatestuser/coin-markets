@@ -7,6 +7,7 @@ import initStore from '../store/initStore';
 import Layout from '../components/Layout';
 import FlexBox from '../components/FlexBox';
 import Heading from '../components/Heading';
+import Ticker from '../components/Ticker';
 import OrderBook from '../components/OrderBook';
 import Trades from '../components/Trades';
 import BitfinexSubscriptionProvider from '../network/BitfinexSubscriptionProvider';
@@ -27,6 +28,11 @@ class TradePage extends Component {
 
   render() {
     const { symbol } = this.props;
+    const tickerReq = {
+      event: 'subscribe',
+      channel: 'ticker',
+      symbol,
+    };
     const ordersReq = {
       event: 'subscribe',
       channel: 'book',
@@ -42,12 +48,14 @@ class TradePage extends Component {
     return (
       <Layout breadcrumb={<strong>Viewing Market: {symbol}</strong>} url={this.props.url}>
         <FlexBox justify="space-between" padding="0 10px">
-          <PaddedFlexBox basis="30%" direction="column">
-            <Heading uppercase={true}>
-              Ticker
-            </Heading>
-
-          </PaddedFlexBox>
+          <BitfinexSubscriptionProvider req={tickerReq}>
+            <PaddedFlexBox basis="100%" direction="column">
+              <Heading uppercase={true}>
+                Ticker
+              </Heading>
+              <Ticker symbol={symbol} />
+            </PaddedFlexBox>
+          </BitfinexSubscriptionProvider>
         </FlexBox>
         <BitfinexSocketProvider>
           <FlexBox justify="space-between" padding="0 10px">
