@@ -28,6 +28,6 @@ const StyledButton = styled.a`
 `;
 
 export default props => (
-  <Link route={props.route}>
+  <Link route={props.route} prefetch={true}>
     <StyledButton>{props.children}</StyledButton>
   </Link>);

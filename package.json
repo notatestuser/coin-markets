@@ -2,9 +2,10 @@
   "name": "bfx-coin-markets",
   "version": "0.1.0",
   "scripts": {
-    "dev": "NODE_ENV=development node server.js",
-    "build": "rm -rf .next && next build",
-    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "NODE_ENV=production next build",
+    "start": "NODE_ENV=production node server.js",
+    "postinstall": "NODE_ENV=production next build",
     "lint": "eslint --ext .js ."
   },
   "dependencies": {

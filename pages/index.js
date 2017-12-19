@@ -41,7 +41,7 @@ class IndexPage extends Component {
     return (
       <Layout url={this.props.url}>
         <Heading>Choose a Market</Heading>
-        <FlexBox>
+        <FlexBox justify="center">
           {is.empty(symbols) || is.string(symbols) ?
             <div>Could not fetch symbols. Was this request rate limited?</div> :
             symbols.map(symbol => (
