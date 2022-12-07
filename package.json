@@ -12,7 +12,7 @@
     "antd": "^2.13.0",
     "bog": "^1.0.2",
     "cors": "^2.8.4",
-    "express": "^4.14.0",
+    "express": "^4.17.3",
     "express-http-proxy": "^1.1.0",
     "grommet-icons": "^0.14.0",
     "is": "^3.2.1",
